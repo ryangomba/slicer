@@ -153,7 +153,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "python slice.py \"$PROJECT_DIR/Design/Slicer.sketch\" \"$PROJECT_DIR/Support/Images.xcassets\"";
+			shellScript = "python \"$PROJECT_DIR/slice.py\" \"$PROJECT_DIR/Design/Slicer.sketch\" \"$PROJECT_DIR/Support/Images.xcassets\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
