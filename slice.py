@@ -5,7 +5,6 @@ import shutil
 import json
 import re
 import time
-import hashlib
 from distutils.spawn import find_executable
 
 ################################################################################
@@ -40,14 +39,6 @@ class AssetGroup(object):
         self.name = name
         self.assets = []
 
-    def generate_hash(self):
-        md5 = hashlib.md5()
-        for asset in self.assets:
-            asset_data = open(asset.path, 'rb').read()
-            md5.update(asset_data)
-        self.md5 = md5.hexdigest()
-        return self.md5
-
     @property
     def imageset_directory(self):
         imageset_name = self.name + ".imageset"
@@ -62,7 +53,7 @@ class AssetGroup(object):
         info = {
             'images': [],
             'info': {
-                'version': self.md5,
+                'version': '1',
                 'author': 'Slicer',
             },
         }
@@ -149,8 +140,7 @@ if sketchtool_executable is None:
 print "Creating temporary export directory"
 create_empty_directory(EXPORT_DIR)
 
-print "Exporting slices from", INPUT_FILE, "to temporary directory", EXPORT_DIR
-
+print "Exporting slices"
 subprocess.call([
     sketchtool_executable,
     'export',
@@ -172,33 +162,15 @@ for filename in os.listdir(EXPORT_DIR):
         asset_group = AssetGroup(asset.group_name)
         asset_groups[asset.group_name] = asset_group
     asset_group.assets.append(asset)
-    asset_group.generate_hash()
-
-# determine which assets have changed
-
-modified_asset_groups = []
-for asset_group in asset_groups.values():
-    info_file_path = asset_group.imageset_info_file_path
-    if os.path.exists(info_file_path):
-        info = json.load(open(info_file_path, 'r'))
-        if info:
-            group_hash = info['info']['version']
-            if group_hash == asset_group.md5:
-                break
-    modified_asset_groups.append(asset_group)
-
-if len(modified_asset_groups) == 0:
-    print 'All assets up to date'
-else:
-    print 'Detected %d modified asset groups' % len(modified_asset_groups)
-    print "Generating imagesets"
 
 # move assets into imagesets
 
 print "Creating output directory"
-create_directory(OUTPUT_DIR)
+create_empty_directory(OUTPUT_DIR)
 
-for asset_group in modified_asset_groups:
+print "Generating imagesets"
+
+for asset_group in asset_groups.values():
     # create the imageset
     imageset_directory = os.path.join(OUTPUT_DIR, asset_group.name + '.imageset')
     create_empty_directory(imageset_directory)
@@ -209,13 +181,13 @@ for asset_group in modified_asset_groups:
     imageset_info_file_path = os.path.join(imageset_directory, 'Contents.json')
     write_dict_to_file_path(imageset_info_file_path, asset_group.info)
 
-# save some export info
+# save the export timestamp
 
 write_dict_to_file_path(OUTPUT_INFO_PATH, {'timestamp': time.time()})
 
 # delete the temporary export directory
 
-print 'Cleaning up'
+print 'Deleting temporary export directory'
 shutil.rmtree(EXPORT_DIR)
 
 # print the time
