@@ -65,7 +65,7 @@ class Asset(object):
     def __init__(self, path):
         self.path = path
         self.filename = path.rpartition("/")[2]
-        regex_match = re.search("(\\w+)@?(.*?)\\.(.+)", filename, re.S)
+        regex_match = re.search("([\\w\\s]+)@?(.*?)\\.(.+)", filename, re.S)
         self.group_name = regex_match.group(1)
         scale = regex_match.group(2)
         if len(scale) == 0:
