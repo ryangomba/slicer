@@ -150,7 +150,6 @@ subprocess.call([
     sketchtool_executable,
     'export',
     'slices',
-    '--scales="1.0, 2.0, 3.0"',
     INPUT_FILE,
     '--output=' + EXPORT_DIR,
 ])
