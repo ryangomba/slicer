@@ -89,8 +89,8 @@ start_time = time.time()
 
 # parse arguments
 
-if not len(sys.argv) == 3:
-    print "Proper usage: python slice.py [.sketch file] [.xcassets file]"
+if not len(sys.argv) == 4:
+    print "Proper usage: python slice.py [.sketch file] [.xcassets file] Group"
     exit(1)
 
 INPUT_FILE = os.path.abspath(sys.argv[1])
@@ -108,9 +108,14 @@ if not os.path.exists(ASSETS_FILE):
 if not ASSETS_FILE.endswith('.xcassets'):
     print "Output file is expected to be a .xcassets bundle"
     exit(1)
+    
+ASSETS_GROUP = sys.argv[3]
+if not ASSETS_GROUP:
+    ASSETS_GROUP = "Slices"
+    
 
 EXPORT_DIR = os.path.join(os.path.dirname(INPUT_FILE), 'tmp_exported_slices')
-OUTPUT_DIR = os.path.join(ASSETS_FILE, 'Slices')
+OUTPUT_DIR = os.path.join(ASSETS_FILE, ASSETS_GROUP)
 OUTPUT_INFO_PATH = os.path.join(OUTPUT_DIR, 'info.json')
 
 # check to see if the sketch file has been modified
